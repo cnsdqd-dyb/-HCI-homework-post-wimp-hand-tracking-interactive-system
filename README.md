@@ -44,6 +44,7 @@ To run the system, follow these steps:
 
 - **Gesture Controls**: Perform specific hand gestures to control the computer (e.g., move the mouse, click, drag, etc.).
 - **Voice Commands**: Speak commands to perform actions or receive suggestions from the AI assistant.
+- **Demo Video**: See Demo usage in `demo.mp4`
 
 ## Contributing
 
@@ -55,4 +56,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any questions or suggestions, please contact [your-email@example.com](mailto:your-email@example.com).
+For any questions or suggestions, please contact [2739434631@qq.com](mailto:2739434631@qq.com).
