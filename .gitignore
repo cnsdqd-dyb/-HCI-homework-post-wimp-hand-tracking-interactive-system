@@ -1,3 +1,6 @@
 *.wav
 train/data/
 screenshot.png
+*/__pycache__/
+*.pyc
+__pycache__

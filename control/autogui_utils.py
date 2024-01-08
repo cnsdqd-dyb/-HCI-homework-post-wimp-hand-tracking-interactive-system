@@ -9,26 +9,12 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from img2pose.utils import hand_angle, h_gesture
 from train.utils import load_model, get_label
-# move(x, y, duration=num_seconds)
-# moveRel(xOffset, yOffset, duration=num_seconds)
-# moveTo(x, y, duration=num_seconds)
-# click(x, y, button='left')
-# rightClick
-# doubleClick
-# dragTo
-# dragRel
-# drag
-# mouseDown
-# mouseUp
-# scroll
-# press
-# hotkey
-# typewrite
-
+from chat_model.openai_models import *
+from speech_api.api import *
 
 
 class controller():
-    def __init__(self):
+    def __init__(self, use_audio = False, use_llm = False):
         self.screen_width, self.screen_height = controller.get_screen_size()
         self.real_screen_width, self.real_screen_height = controller.get_real_resolution()
         self.hand_screen_width, self.hand_screen_height = 1, 1
@@ -51,10 +37,20 @@ class controller():
 
         self.scroll_accelleration = 1.1
         self.scroll_speed = 1
+        self.scroll_mode = 0
         self.scroll_max_speed = min(self.real_screen_width, self.real_screen_height) // 2
 
         self.drag_down = False
         pyautogui.FAILSAFE=False
+
+        self.use_audio = use_audio
+        self.use_llm = use_llm
+        if use_llm:
+            self.llm = OpenAILanguageModel(api_model="gpt-3.5-turbo")
+        self.move_monitor()
+
+    def position(self):
+        return pyautogui.position()
 
     
     def get_real_resolution():
@@ -165,7 +161,7 @@ class controller():
         root_x = 0
         root_y = 0
         root_z = 0
-        
+
         results = self.sort_hands(results)
 
         self.update_current_state(results)
@@ -258,11 +254,17 @@ class controller():
                 if self.current_state == 'scroll up':
                     self.scroll_speed *= self.scroll_accelleration
                     self.scroll_speed = min(self.scroll_speed, self.scroll_max_speed)
-                    t = threading.Thread(target=pyautogui.scroll, args=[-int(self.scroll_speed)])
+                    if self.scroll_mode == 0:
+                        t = threading.Thread(target=pyautogui.vscroll, args=[int(self.scroll_speed)])
+                    else:
+                        t = threading.Thread(target=pyautogui.scroll, args=[-int(self.scroll_speed)])
                 elif self.current_state == 'scroll down':
                     self.scroll_speed *= self.scroll_accelleration
                     self.scroll_speed = min(self.scroll_speed, self.scroll_max_speed)
-                    t = threading.Thread(target=pyautogui.scroll, args=[int(self.scroll_speed)])
+                    if self.scroll_mode == 0:
+                        t = threading.Thread(target=pyautogui.vscroll, args=[-int(self.scroll_speed)])
+                    else:
+                        t = threading.Thread(target=pyautogui.scroll, args=[int(self.scroll_speed)])
                 elif self.current_state == 'scroll left':
                     self.scroll_speed *= self.scroll_accelleration
                     self.scroll_speed = min(self.scroll_speed, self.scroll_max_speed)
@@ -305,7 +307,19 @@ class controller():
                     t = threading.Thread(target=pyautogui.moveRel, args=[self.move_speed[0], self.move_speed[1]])
 
                 elif self.current_state == 'type write':
-                    pyautogui.typewrite('Hello world!')
+                    if self.use_audio:
+                        # speech 2 text
+                        record_wav(output_filename='speech.wav')
+                        transcript = speech_recognition(filename='speech.wav')
+                        # text 2 text
+                        if self.use_llm:
+                            system_prompt = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly."
+                            user_prompt = "Now, you are acting as a post-wimp system typing on the keyboard. you are helping the user to type the following words or give some suggestions."
+                            user_prompt += "The user says: " + transcript
+                            transcript = self.llm.few_shot_generate_thoughts(system_prompt, user_prompt)
+                        pyautogui.typewrite(transcript)
+                    else:
+                        pyautogui.typewrite('Hello world! (please use audio for better experience)')
                     self.last_state = self.current_state
                 else:
                     ...
