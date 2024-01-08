@@ -38,20 +38,12 @@ To run the system, follow these steps:
 
 1. **Install Dependencies**: Ensure you have `mediapipe`, `OpenAI` API, `pyautogui`, and `streamlit` installed.
 2. **Set Up the Environment**: Configure the system settings as per your preferences (e.g., confidence levels, scroll modes, etc.).
-3. **Run the Application**: Execute the Python script to start the application. (streamlit run app.py)
+3. **Run the Application**: Execute the Python script to start the application. (`streamlit run app.py`)
 
 ## Usage
 
 - **Gesture Controls**: Perform specific hand gestures to control the computer (e.g., move the mouse, click, drag, etc.).
 - **Voice Commands**: Speak commands to perform actions or receive suggestions from the AI assistant.
-
-## Illustrations
-
-[Insert image of hand gesture recognition here]
-
-[Insert image of voice recognition process here]
-
-[Insert image of Streamlit interface here]
 
 ## Contributing
 
